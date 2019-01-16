@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>online status</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="shortcut icon" href="/public/favicon.ico" mce_href="/public/favicon.ico" type="image/x-icon">
+
+    <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+    <script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .list-group-item div{
+            margin-bottom: 5px;
+        }
+        .list-group{
+            box-shadow: 0px 0px 5px #ccc;
+            border-radius:5px;
+        }
+        .list-group-item-status{
+            height: 250px;
+        }
+        .list-group:hover{
+            box-shadow: 0px 10px 40px #ccc;
+            border-radius:5px;
+        }
+        .jumbotron-site{
+            /* background: linear-gradient(rgb(110, 155, 201),rgb(142, 180, 214),#fff); */
+            /* background: #DA70D6; */
+            /* border-bottom: 1px solid #ccc; */
+            /* color: white; */
+            background: #fff;
+            box-shadow: 0px 0px 10px #aaa;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="jumbotron jumbotron-site text-center">
+            <div class="container">
+                <h2>Online Checker</h2>
+                <p>Simple Client & Server for checking device online.</p>
+                <button id="btn_connect" type="button" class="btn btn-success" v-show="btn_connect_show" v-on:click="do_connect">
+                    <span class="glyphicon glyphicon-record"></span>
+                </button>
+            </div>
+        </div>
+        <div class="container">
+            <label>Online Status</label>
+            <div class="row">
+                <div class="col-md-3 col-sm-4 col-xs-12" v-for="status in statusList">
+                    <ul class="list-group">
+                        <li class="list-group-item"><img src="/public/img/imac-new.png" width="100%"></li>
+                        <li class="list-group-item text-center list-group-item-status">
+                            <div v-if="status.userAgent === userAgent">
+                                <button v-on:click="do_disconnect" class="btn btn-danger"><span class="glyphicon glyphicon-off"></span></button>
+                            </div>
+                            <div>
+                                <h3 v-if="status.userAgent === userAgent" class="text-success">本机</h3>
+                                <label v-else>${status.userAgent}</label>
+                            </div>
+                            <div>最后上线时间：${get_local_time(status.time)}</div>
+                            <div>
+                                <label class="text-success" v-if="status.online">online</label>
+                                <label class="text-danger" v-else>offline</label>
+                            </div>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+            <label>User Agent</label>
+            <div class="row">
+                <div class="col-xs-12">
+
+                    <div class="panel panel-default">
+
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>OS</th>
+                                    <th>Browser</th>
+                                </tr>
+                            </thead>
+                            <tr>
+                                <td>${userAgentInfo.os}</td>
+                                <td>${userAgentInfo.browser}</td>
+                            </tr>
+                        </table>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        var app = new Vue({
+            delimiters: ['${', '}'],
+            el: '#app',
+            data: {
+                statusList: [{}],
+                userAgent: navigator.userAgent.toLowerCase(),
+                connect_id: -1,
+                refresh_list_time: 3000,
+                reconnect_time: 3000,
+                btn_connect_show: false,
+                userAgentInfo: {
+                    //操作系统
+                    os: "",
+                    browser: ""
+                }
+
+            },
+            methods: {
+                getStatusList: function () {
+                    this.$http.get('/status/list').then(function (res) {
+                        // console.log('getStatusList success');
+                        this.statusList = res.data;
+                    }, function () {
+                        console.log('getStatusList error');
+                    });
+                },
+                do_getStatusList: function () {
+                    this.getStatusList();
+                    setInterval(() => {
+                        this.getStatusList();
+                    }, this.refresh_list_time);
+                },
+                getJson: function () {
+                    return { userAgent: this.userAgent };
+                },
+                connect: function () {
+                    //发送 post 请求
+                    this.$http.post('/status/connect', this.getJson()).then(function (res) {
+                        this.getStatusList();
+                        // console.log("connect success");
+                    }, function (res) {
+                        console.log("connect error");
+                    });
+
+                },
+                disconnect: function () {
+                    //发送 post 请求
+                    this.$http.post('/status/disconnect', this.getJson()).then(function (res) {
+                        this.getStatusList();
+                        // alert("disconnect success");
+                        // console.log("disconnect success");
+                    }, function (res) {
+                        console.log("disconnect error");
+                    });
+
+                },
+                do_connect: function () {
+                    this.connect();
+                    this.connect_id = setInterval(() => {
+                        this.connect();
+                    }, this.reconnect_time);
+                    this.show_btn_connect(false);
+                },
+                do_disconnect: function () {
+                    this.disconnect();
+                    window.clearInterval(this.connect_id);
+                    this.show_btn_connect(true);
+                },
+                get_local_time: function (nS) {
+                    return new Date(parseInt(nS) * 1000).toLocaleString().replace(/:\d{1,2}$/, ' ');
+                },
+                show_btn_connect: function (show) {
+                    this.btn_connect_show = show;
+                    console.log(this.btn_connect_show);
+                },
+                parse_user_agent: function () {
+                    let data = {
+                        terminal: undefined,
+                        browser: undefined
+                    };
+                    let regs = {};
+                    let terminal = {
+                        'windows nt 10': 'Windows 10',
+                        'windows nt 6.3': 'Windows 8.1',
+                        'windows nt 6.2': 'Windows 8',
+                        'windows nt 6.1': 'Windows 7',
+                        'windows nt 6.0': 'Windows Vista',
+                        'windows nt 5.2': 'Windows Server 2003XP x64',
+                        'windows nt 5.1': 'Windows XP',
+                        'windows xp': 'Windows XP',
+                        'windows nt 5.0': 'Windows 2000',
+                        'windows me': 'Windows ME',
+                        'win98': 'Windows 98',
+                        'win95': 'Windows 95',
+                        'win16': 'Windows 3.11',
+                        'macintosh|mac os x': 'Mac OS X',
+                        'mac_powerpc': 'Mac OS 9',
+                        'android': 'Android',
+                        'linux': 'Linux',
+                        'ubuntu': 'Ubuntu',
+                        'iphone': 'iPhone',
+                        'ipod': 'iPod',
+                        'ipad': 'iPad',
+                        'blackberry': 'BlackBerry',
+                        'webos': 'Mobile',
+                        'freebsd': 'FreeBSD',
+                        'sunos': 'Solaris'
+                    };
+
+                    var userAgent = this.userAgent;
+
+                    for (let key in terminal) {
+                        if (new RegExp(key).test(userAgent)) {
+                            data.terminal = terminal[key];
+                            break;
+                        }
+                    }
+
+                    var browser_name = 'Failed to identify the browser';
+                    if (userAgent.indexOf('firefox') > -1) {
+                        browser_name = 'Firefox';
+                    } else if (userAgent.indexOf('chrome') > -1) {
+                        browser_name = 'Chrome';
+                    } else if (userAgent.indexOf('trident') > -1 && userAgent.indexOf('rv:11') > -1) {
+                        browser_name = 'IE11';
+                    } else if (userAgent.indexOf('msie') > -1 && userAgent.indexOf('trident') > -1) {
+                        browser_name = 'IE(8-10)';
+                    } else if (userAgent.indexOf('msie') > -1) {
+                        browser_name = 'IE(6-7)';
+                    } else if (userAgent.indexOf('opera') > -1) {
+                        browser_name = 'Opera';
+                    } else {
+                        browser_name += ',info:' + userAgent;
+                    }
+                    data.browser = browser_name;
+                    console.log(data.terminal);
+                    console.log(data.browser);
+                    this.userAgentInfo.os = data.terminal;
+                    this.userAgentInfo.browser = data.browser;
+                }
+            },
+            mounted() {
+                this.do_getStatusList();
+                this.do_connect();
+                this.parse_user_agent();
+            }
+        });
+
+        window.onbeforeunload = function () {
+            app.do_disconnect();
+        }
+
+    </script>
+</body>
+
+</html>
