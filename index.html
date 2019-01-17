@@ -9,91 +9,112 @@
     <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
     <script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
     <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .list-group-item div{
-            margin-bottom: 5px;
-        }
-        .list-group{
-            box-shadow: 0px 0px 5px #ccc;
-            border-radius:5px;
-        }
-        .list-group-item-status{
-            height: 250px;
-        }
-        .list-group:hover{
-            box-shadow: 0px 10px 40px #ccc;
-            border-radius:5px;
-        }
-        .jumbotron-site{
-            /* background: linear-gradient(rgb(110, 155, 201),rgb(142, 180, 214),#fff); */
-            /* background: #DA70D6; */
-            /* border-bottom: 1px solid #ccc; */
-            /* color: white; */
-            background: #fff;
-            box-shadow: 0px 0px 10px #aaa;
-        }
-    </style>
+    <link href="/public/css/site.css" rel="stylesheet">
 </head>
 
 <body>
     <div id="app">
+        <div class="btn-conf">
+            <div class="dropdown pull-right">
+                <a id="dropdownMenu1" data-toggle="dropdown">
+                    操作
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                    <li role="presentation">
+                        <a role="menuitem" tabindex="-1" href="#">你好！{{.username}}</a>
+                    </li>
+                    <li role="presentation" class="divider"></li>
+                    <li role="presentation">
+                        <a role="menuitem" tabindex="-1" href="/help">帮助</a>
+                    </li>
+                    <li role="presentation" class="divider"></li>
+                    <li role="presentation">
+                        <a role="menuitem" tabindex="-1" href="#" v-on:click="signout">登出</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
         <div class="jumbotron jumbotron-site text-center">
             <div class="container">
                 <h2>Online Checker</h2>
-                <p>Simple Client & Server for checking device online.</p>
-                <button id="btn_connect" type="button" class="btn btn-success" v-show="btn_connect_show" v-on:click="do_connect">
-                    <span class="glyphicon glyphicon-record"></span>
-                </button>
+                <!-- <p data-toggle="tooltip" data-placement="bottom" title="帮助你随时查看设备在线情况">Simple Client & Server for checking device online.</p> -->
+                <p>一个简单的应用，<a href="/help">帮助</a>你随时查看设备在线情况 </p>
+                <div v-show="btn_connect_show">
+                    <div><img src="/public/img/hand.png" class="img-hand" width="100px;" height="100px;"></div>
+                    <a v-on:click="do_connect" class="btn-glyphicon text-success" data-toggle="tooltip" data-placement="bottom"
+                        title="点击开始记录"><span class="glyphicon glyphicon-record"></span></a>
+                </div>
+                <img id="img_disconnect" v-show="false" src="/public/img/disconnect.png" style="margin-top:40px;">
             </div>
         </div>
         <div class="container">
-            <label>Online Status</label>
-            <div class="row">
-                <div class="col-md-3 col-sm-4 col-xs-12" v-for="status in statusList">
+            <div class="row" style="text-align:center;">
+                <div class="col-md-3 col-sm-4 col-xs-6" v-for="status in statusList">
                     <ul class="list-group">
-                        <li class="list-group-item"><img src="/public/img/imac-new.png" width="100%"></li>
+                        <li class="list-group-item" style="background:#eee;"><img v-bind:src="status.icon" width="100%"></li>
                         <li class="list-group-item text-center list-group-item-status">
                             <div v-if="status.userAgent === userAgent">
-                                <button v-on:click="do_disconnect" class="btn btn-danger"><span class="glyphicon glyphicon-off"></span></button>
+                                <a href="#">
+                                    <h3 data-toggle="modal" data-target="#userAgentModal">本机</h3>
+                                </a>
+                                <div class="small text-info">IP : ${status.ip}</div>
+                                <a class="btn-glyphicon text-danger" v-on:click="do_disconnect"><span class="glyphicon glyphicon-off"></span></a>
                             </div>
-                            <div>
-                                <h3 v-if="status.userAgent === userAgent" class="text-success">本机</h3>
-                                <label v-else>${status.userAgent}</label>
+                            <div v-else>
+                                <h3>${status.os}</h3>
+                                <div class="small text-success" v-if="status.online">IP : ${status.ip}</div>
+                                <div class="small text-danger" v-else>IP : ${status.ip}</div>
+                                <div class="small" style="line-height:20px;white-space:nowrap;text-overflow:ellipsis;word-break:break-all;overflow:hidden;">${get_local_time(status.time)}</div>
+                                <div class="progress progress-striped active" v-if="status.online">
+                                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60"
+                                        aria-valuemin="0" aria-valuemax="100" style="width: 100%;">
+                                        <span class="sr-only">online</span>
+                                    </div>
+                                </div>
+                                <div class="progress progress-striped active" v-else>
+                                    <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="60"
+                                        aria-valuemin="0" aria-valuemax="100" style="width: 100%;">
+                                        <span class="sr-only">offline</span>
+                                    </div>
+                                </div>
+                                <!-- <div>
+                                        
+                                    <label class="text-success" >online</label>
+                                    <label class="text-danger" v-else>offline</label>
+                                </div> -->
                             </div>
-                            <div>最后上线时间：${get_local_time(status.time)}</div>
-                            <div>
-                                <label class="text-success" v-if="status.online">online</label>
-                                <label class="text-danger" v-else>offline</label>
-                            </div>
+
                         </li>
 
                     </ul>
                 </div>
             </div>
-            <label>User Agent</label>
-            <div class="row">
-                <div class="col-xs-12">
+            <div class="bottom-bar small text-center">
+                Copyright © 208-2019 liuhan All Rights Reserved.
+            </div>
+            <!-- 模态框（Modal） -->
+            <div class="modal fade" id="userAgentModal" tabindex="-1" role="dialog" aria-labelledby="userAgentModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title" id="userAgentModalLabel">设备信息</h4>
+                        </div>
 
-                    <div class="panel panel-default">
-
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>OS</th>
-                                    <th>Browser</th>
-                                </tr>
-                            </thead>
-                            <tr>
-                                <td>${userAgentInfo.os}</td>
-                                <td>${userAgentInfo.browser}</td>
-                            </tr>
-                        </table>
-
-                    </div>
-
-                </div>
+                        <div class="modal-body">
+                            <ul>
+                                <li>操作系统：${userAgentInfo.os} </li>
+                                <li>浏览器：${userAgentInfo.browser}</li>
+                                <li>浏览器详情：[${userAgent}]</li>
+                            </ul>
+                        </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal -->
             </div>
         </div>
     </div>
@@ -104,8 +125,9 @@
             data: {
                 statusList: [{}],
                 userAgent: navigator.userAgent.toLowerCase(),
+                list_id: -2,
                 connect_id: -1,
-                refresh_list_time: 3000,
+                refresh_list_time: 1000,
                 reconnect_time: 3000,
                 btn_connect_show: false,
                 userAgentInfo: {
@@ -119,19 +141,35 @@
                 getStatusList: function () {
                     this.$http.get('/status/list').then(function (res) {
                         // console.log('getStatusList success');
+                        this.show_disconnect(false);
                         this.statusList = res.data;
-                    }, function () {
+                    }, function (res) {
                         console.log('getStatusList error');
+                        if (res.status == 403) {
+                            console.log('unsignined');
+                            window.location.href = "/";
+                        } else {
+                            this.statusList = null;
+                            this.show_disconnect(true);
+                        }
                     });
+                },
+                show_disconnect: function (t) {
+                    if (t) {
+                        $("#img_disconnect").show();
+                    } else {
+                        $("#img_disconnect").hide();
+                    }
+
                 },
                 do_getStatusList: function () {
                     this.getStatusList();
-                    setInterval(() => {
+                    this.list_id = setInterval(() => {
                         this.getStatusList();
                     }, this.refresh_list_time);
                 },
                 getJson: function () {
-                    return { userAgent: this.userAgent };
+                    return { userAgent: this.userAgent, os: this.userAgentInfo.os.toLowerCase() };
                 },
                 connect: function () {
                     //发送 post 请求
@@ -140,6 +178,7 @@
                         // console.log("connect success");
                     }, function (res) {
                         console.log("connect error");
+                        // window.clearInterval(this.connect_id);
                     });
 
                 },
@@ -171,13 +210,17 @@
                 },
                 show_btn_connect: function (show) {
                     this.btn_connect_show = show;
-                    console.log(this.btn_connect_show);
+                },
+                signout: function () {
+                    this.do_disconnect();
+                    //发送 post 请求
+                    this.$http.post('/signout', {}).then(function (res) {
+
+                    }, function (res) {
+                        console.log("signout error");
+                    });
                 },
                 parse_user_agent: function () {
-                    let data = {
-                        terminal: undefined,
-                        browser: undefined
-                    };
                     let regs = {};
                     let terminal = {
                         'windows nt 10': 'Windows 10',
@@ -193,14 +236,14 @@
                         'win98': 'Windows 98',
                         'win95': 'Windows 95',
                         'win16': 'Windows 3.11',
-                        'macintosh|mac os x': 'Mac OS X',
-                        'mac_powerpc': 'Mac OS 9',
                         'android': 'Android',
-                        'linux': 'Linux',
                         'ubuntu': 'Ubuntu',
+                        'linux': 'Linux',
                         'iphone': 'iPhone',
                         'ipod': 'iPod',
                         'ipad': 'iPad',
+                        'macintosh|mac os x': 'Mac OS X',
+                        'mac_powerpc': 'Mac OS 9',
                         'blackberry': 'BlackBerry',
                         'webos': 'Mobile',
                         'freebsd': 'FreeBSD',
@@ -209,14 +252,16 @@
 
                     var userAgent = this.userAgent;
 
+                    var os = "Others"
                     for (let key in terminal) {
                         if (new RegExp(key).test(userAgent)) {
-                            data.terminal = terminal[key];
+                            os = terminal[key];
                             break;
                         }
                     }
 
-                    var browser_name = 'Failed to identify the browser';
+
+                    var browser_name = 'Others';
                     if (userAgent.indexOf('firefox') > -1) {
                         browser_name = 'Firefox';
                     } else if (userAgent.indexOf('chrome') > -1) {
@@ -230,19 +275,23 @@
                     } else if (userAgent.indexOf('opera') > -1) {
                         browser_name = 'Opera';
                     } else {
-                        browser_name += ',info:' + userAgent;
+                        console.log('Failed to identify the browser,info:' + userAgent);
                     }
-                    data.browser = browser_name;
-                    console.log(data.terminal);
-                    console.log(data.browser);
-                    this.userAgentInfo.os = data.terminal;
-                    this.userAgentInfo.browser = data.browser;
+
+                    if (this.userAgentInfo.os != os) {
+                        this.userAgentInfo.os = os;
+                    }
+                    if (this.userAgentInfo.browser != browser_name) {
+                        this.userAgentInfo.browser = browser_name;
+                    }
+
                 }
             },
             mounted() {
+                this.parse_user_agent();
                 this.do_getStatusList();
                 this.do_connect();
-                this.parse_user_agent();
+
             }
         });
 
@@ -254,6 +303,7 @@
             app.do_disconnect();
         }
 
+        $(function () { $("[data-toggle='tooltip']").tooltip(); });
 
     </script>
 </body>

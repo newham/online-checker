@@ -1,0 +1,48 @@
+a{
+    cursor:pointer;
+}
+.list-group-item div{
+    margin-bottom: 5px;
+}
+.list-group,.panel {
+    box-shadow: 0px 0px 5px #ccc;
+    /* box-shadow: 0 2px 2px 0 rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.08); */
+    border-radius:5px;
+}
+.list-group-item-status{
+    height: 140px;
+}
+.list-group-item-status h3{
+    margin-top: 10px;
+}
+.list-group:hover,.panel:hover{
+    box-shadow: 0px 0px 20px #ccc;
+    border-radius:5px;
+}
+.jumbotron-site{
+    /* background: linear-gradient(rgb(110, 155, 201),rgb(142, 180, 214),#fff); */
+    /* background: #DA70D6; */
+    /* border-bottom: 1px solid #ccc; */
+    /* color: white; */
+    /* background: linear-gradient(#ddd,#eee); */
+    background: #fff;
+    /* box-shadow: 0px 0px 10px #aaa; */
+    margin-bottom: 10px;
+}
+.img-hand{
+    /* height: 30px;
+    width: 30px; */
+    margin-bottom: 10px;
+}
+.btn-glyphicon{
+    font-size: 40px;
+    cursor:pointer;
+}
+.bottom-bar{
+    margin-top:40px;
+    margin-bottom: 20px;
+}
+.btn-conf{
+    padding-top:15px;
+    padding-right:15px;
+}

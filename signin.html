@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>online status</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="shortcut icon" href="/public/favicon.ico" mce_href="/public/favicon.ico" type="image/x-icon">
+
+    <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+    <script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/public/css/site.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="jumbotron jumbotron-site text-center">
+        <h1>Online Checker</h1>
+        <p>一个简单的应用，帮助你随时查看设备在线情况</p>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-12" v-for="status in statusList">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <form role="form" method="POST" action="/signin">
+                            <div class="form-group">
+                                <label for="username">用户名:</label>
+                                <input type="text" id="username" class="form-control" placeholder="输入你的用户名" name="username">
+                            </div>
+                            <div class="form-group">
+                                <label for="password">密码:</label>
+                                <input type="password" id="password" class="form-control" placeholder="输入你的密码" name="password">
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-danger btn-block" type="submit">登录</button>
+                            </div>
+                        </form>
+                        <div>没有账户？<a href="/signup">注册</a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="bottom-bar small text-center">
+            Copyright © 208-2019 liuhan All Rights Reserved.
+        </div>
+
+    </div>
+
+</body>
+
+</html>
