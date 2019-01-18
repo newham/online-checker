@@ -48,7 +48,10 @@
                     <a v-on:click="do_connect" class="btn-glyphicon text-success" data-toggle="tooltip" data-placement="bottom"
                         title="点击开始记录"><span class="glyphicon glyphicon-record"></span></a>
                 </div>
-                <img id="img_disconnect" v-show="false" src="/public/img/disconnect.png" style="margin-top:40px;">
+                <div v-show="false" id="img_disconnect">
+                    <img src="/public/img/disconnect.png" style="margin-top:40px;">
+                    <h3>无法连接服务器</h3>
+                </div>
             </div>
         </div>
         <div class="container">
@@ -157,10 +160,10 @@
                 show_disconnect: function (t) {
                     if (t) {
                         $("#img_disconnect").show();
+                        this.show_btn_connect(false);
                     } else {
                         $("#img_disconnect").hide();
                     }
-
                 },
                 do_getStatusList: function () {
                     this.getStatusList();

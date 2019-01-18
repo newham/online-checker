@@ -45,12 +45,12 @@ func getUsername(ctx hamgo.Context)string{
 func Index(ctx hamgo.Context) {
 	println("index")
 	ctx.PutData("username",getUsername(ctx))
-	ctx.HTML("index.html")
+	ctx.HTML("pages/index.html")
 }
 
 func Help(ctx hamgo.Context) {
 	println("help")
-	ctx.HTML("help.html")
+	ctx.HTML("pages/help.html")
 }
 
 type SigninForm struct{
@@ -62,7 +62,7 @@ const SESSION_NAME = "go_session"
 
 func Signin(ctx hamgo.Context) {
 	if strings.ToLower(ctx.Method()) == "get"{
-		ctx.HTML("signin.html")
+		ctx.HTML("pages/signin.html")
 	}else {
 		signinForm :=SigninForm{}
 		ctx.BindForm(&signinForm)
@@ -71,7 +71,7 @@ func Signin(ctx hamgo.Context) {
 			ctx.Redirect("/")
 			return
 		}
-		ctx.HTML("signin.html")
+		ctx.HTML("pages/signin.html")
 	}
 	
 }
@@ -83,7 +83,7 @@ func Signout(ctx hamgo.Context){
 }
 
 func Info(ctx hamgo.Context) {
-	ctx.HTML("info.html")
+	ctx.HTML("pages/info.html")
 }
 
 func Connect(ctx hamgo.Context){
