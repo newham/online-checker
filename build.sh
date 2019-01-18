@@ -8,4 +8,4 @@ docker rmi $image
 
 go build
 docker build -t $image .
-docker run --name="$app" -d -p 8082:8082 -v $current_path/public:/online-checker/public $image
+docker run --restart=always --name="$app" -d -p 8082:8082 -v $current_path/public:/online-checker/public $image
