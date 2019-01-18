@@ -137,6 +137,7 @@ var ICON_MAP =map[string]string {
 	"android":ICON_FOLDER+"android.png",
 	"iphone":ICON_FOLDER+"iphone.png",
 	"ipad":ICON_FOLDER+"ipad.png",
+	"linux":ICON_FOLDER+"linux.png",
 	"others":ICON_FOLDER+"other.png",
 }
 
