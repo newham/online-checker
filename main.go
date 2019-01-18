@@ -9,7 +9,8 @@ import(
 
 func main(){
 	server := hamgo.NewUseConf("app.conf").UseSession(3600).Server().Static("public")
-	server.Filter(SessionFilter).AddAnnoURL("/signin")
+	server.Filter(SessionFilter).AddAnnoURL("/signin").AddAnnoURL("/favicon.ico").AddAnnoURL("/public")
+	server.Get("/favicon.ico",Favicon)
 	server.Get("/", Index)
 	server.Get("/help", Help)
 	server.Handler("/signin", Signin,"POST,GET")
@@ -19,6 +20,10 @@ func main(){
 	server.Post("/status/disconnect", Disconnect)
 	server.Get("/status/list", StatusList)
 	server.RunAt(hamgo.Conf.String("port"))
+}
+
+func Favicon(ctx hamgo.Context){
+	ctx.File("public/favicon.ico")
 }
 
 func SessionFilter(ctx hamgo.Context)bool{
