@@ -8,8 +8,8 @@ import(
 )
 
 func main(){
-	server := hamgo.NewUseConf("app.conf").UseSession(3600).Server().Static("public")
-	server.Filter(SessionFilter).AddAnnoURL("/signin").AddAnnoURL("/favicon.ico").AddAnnoURL("/public")
+	server := hamgo.NewByConf("app.conf").Static("public")
+	server.AddFilter(SessionFilter).AddAnnoURL("/signin","GET","POST")
 	server.Get("/favicon.ico",Favicon)
 	server.Get("/", Index)
 	server.Get("/help", Help)

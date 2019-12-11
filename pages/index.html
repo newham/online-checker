@@ -16,7 +16,7 @@
 </head>
 
 <body>
-    <div id="app">
+    <div id="app" v-cloak>
         <div class="btn-conf">
             <div class="dropdown pull-right">
                 <a id="dropdownMenu1" data-toggle="dropdown">
@@ -56,7 +56,7 @@
         </div>
         <div class="container">
             <div class="row" style="text-align:center;">
-                <div class="col-md-3 col-sm-4 col-xs-12" v-for="status in statusList">
+                <div class="col-md-3 col-sm-4 col-xs-6" v-for="status in statusList">
                     <ul class="list-group">
                         <li class="list-group-item" style="background:#eee;"><img v-bind:src="status.icon" width="100%"></li>
                         <li class="list-group-item text-center list-group-item-status">
